@@ -33,6 +33,8 @@ export class GetOrganizationTeamStatisticHandler implements IQueryHandler<GetOrg
 		input: GetOrganizationTeamStatisticQuery
 	): Promise<IOrganizationTeam> {
 		try {
+			console.time('Get Organization Team ID Query');
+
 			const { organizationTeamId, query } = input;
 			const { withLaskWorkedTask } = query;
 
@@ -55,6 +57,7 @@ export class GetOrganizationTeamStatisticHandler implements IQueryHandler<GetOrg
 				);
 			}
 
+			console.timeEnd('Get Organization Team ID Query');
 			return organizationTeam;
 		} catch (error) {
 			throw new BadRequestException(error);

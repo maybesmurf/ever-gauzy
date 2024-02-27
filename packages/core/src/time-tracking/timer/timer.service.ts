@@ -458,7 +458,6 @@ export class TimerService {
 		 * Get last logs (running or completed)
 		 */
 		const query = this.typeOrmTimeLogRepository.createQueryBuilder('time_log');
-		// query.innerJoin(`${query.alias}.timeSlots`, 'timeSlots');
 		query.setFindOptions({
 			...(request['relations'] ? { relations: request['relations'] } : {}),
 		});
@@ -481,14 +480,12 @@ export class TimerService {
 		const lastLogs = await query.distinctOn([p(`"${query.alias}"."employeeId"`)]).getMany();
 
 		/** Transform an array of ITimeLog objects into an array of ITimerStatus objects. */
-		const statistics: ITimerStatus[] = lastLogs.map((lastLog: ITimeLog) => {
-			return {
-				duration: lastLog?.duration || 0,
-				running: lastLog?.isRunning || false,
-				lastLog: lastLog || null,
-				timerStatus: lastLog?.isRunning ? 'running' : moment(lastLog?.stoppedAt).diff(new Date(), 'day') > 0 ? 'idle' : 'pause',
-			};
-		});
+		const statistics: ITimerStatus[] = lastLogs.map((lastLog: ITimeLog) => ({
+			duration: lastLog?.duration || 0,
+			running: lastLog?.isRunning || false,
+			lastLog: lastLog || null,
+			timerStatus: lastLog?.isRunning ? 'running' : moment(lastLog?.stoppedAt).diff(new Date(), 'day') > 0 ? 'idle' : 'pause',
+		}));
 
 		/**
 		 * @returns An array of ITimerStatus objects.
